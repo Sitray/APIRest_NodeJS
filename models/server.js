@@ -6,10 +6,13 @@ const { dbConnection } = require("../database/config");
 class Server {
   constructor() {
     this.app = express();
-
     this.port = process.env.PORT;
-    this.usuariosPath = "/api/usuarios";
-    this.authPath = "/api/auth";
+
+    this.paths = {
+      usuariosPath: "/api/usuarios",
+      categories: "/api/categories",
+      authPath: "/api/auth",
+    };
 
     //connectar base de datos
     this.connectDb();
@@ -36,8 +39,9 @@ class Server {
   }
 
   routes() {
-    this.app.use(this.authPath, require("../routes/auth"));
-    this.app.use(this.usuariosPath, require("../routes/usuarios"));
+    this.app.use(this.paths.authPath, require("../routes/auth"));
+    this.app.use(this.paths.categories, require("../routes/categories"));
+    this.app.use(this.paths.usuariosPath, require("../routes/usuarios"));
   }
 
   listen() {
