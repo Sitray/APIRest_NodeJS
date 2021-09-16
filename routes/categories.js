@@ -1,33 +1,50 @@
 const { Router } = require("express");
 const { check } = require("express-validator");
 
+const {
+  createCategory,
+  getCategories,
+  getCategory,
+  updateCategory,
+  deleteCategory,
+} = require("../controllers/categories");
+const { checkIfCategoryExists } = require("../helpers/db-validators");
+
+const { validateJWT } = require("../middlewares/validate-jwt");
 const { validations } = require("../middlewares/validations");
 
 const router = Router();
 
 //obtener todas las categorías
-router.get("/", (req, res) => {
-  res.json({ msg: "Todo ok" });
-});
+router.get("/", [getCategories]);
 
 //categoría por ID
-router.get("/:id", (req, res) => {
-  res.json({ msg: "Todo ok id" });
-});
+router.get(
+  "/:id",
+  [
+    check("id", "el id no es válido").isMongoId(),
+    check("id").custom(checkIfCategoryExists),
+    validations,
+  ],
+  getCategory
+);
 
+//check("id").custom(existecategoria)
 //crear categoría
-router.post("/", (req, res) => {
-  res.json({ msg: "post" });
-});
+router.post(
+  "/",
+  [
+    validateJWT,
+    check("name", "el nombre es obligatorio").not().isEmpty(),
+    validations,
+  ],
+  createCategory
+);
 
 //actualizar categoría
-router.put("/:id", (req, res) => {
-  res.json({ msg: "put" });
-});
+router.put("/:id", [updateCategory]);
 
 //borrar categoría solo si es un administrador
-router.delete("/:id", (req, res) => {
-  res.json({ msg: "delete" });
-});
+router.delete("/:id", [deleteCategory]);
 
 module.exports = router;
