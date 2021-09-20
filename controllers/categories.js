@@ -62,9 +62,13 @@ const getCategory = async (req, res = response) => {
 
 const updateCategory = async (req, res = response) => {
   const { id } = req.params;
-  const { _id, ...rest } = req.body;
+  const { state, user, ...rest } = req.body;
 
-  const category = await Category.findByIdAndUpdate(id, rest);
+  rest.name = rest.name.toUpperCase();
+  rest.user = req.user._id;
+
+  const category = await Category.findByIdAndUpdate(id, rest, { new: true });
+
   res.json({
     category,
   });
